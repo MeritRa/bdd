@@ -13,28 +13,31 @@ import static ru.netology.data.DataHelper.getFirstCardInfo;
 import static ru.netology.data.DataHelper.getSecondCardInfo;
 
 public class CardTransferTest {
+    DashboardPage dashboardPage;
+    CardTransferPage cardTransferPage;
     @BeforeEach
     void setUp() {
         open("http://localhost:9999/");
-        var LoginPage = new LoginPage();
+        var loginPage = new LoginPage();
         var authInfo = DataHelper.getAuthInfo();
-        var verificationPage = LoginPage.validLogin(authInfo);
+        var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCode(authInfo);
-        var DashboardPage = verificationPage.validVerify(verificationCode);
+        dashboardPage = verificationPage.validVerify(verificationCode);
     }
 
     @Test
     public void shouldTransferMoneySuccessfullyTest() {
         var firstCardInfo = getFirstCardInfo();
         var secondCardInfo = getSecondCardInfo();
-        var firstCardBalance = DashboardPage.getCardBalance(firstCardInfo);
-        var secondCardBalance = DashboardPage.getCardBalance(secondCardInfo);
-        var amount = DataHelper.getValidAmount(firstCardInfo);
+        var firstCardBalance = dashboardPage.getCardBalance(firstCardInfo);
+        var secondCardBalance = dashboardPage.getCardBalance(secondCardInfo);
+        var amount = DataHelper.getValidAmount(10000);
         var expectedFirstCardBalance = firstCardBalance - amount;
         var expectedSecondCardBalance = secondCardBalance + amount;
-        CardTransferPage.makeTransfer(String.valueOf(amount), firstCardInfo.getCardNumber(), secondCardInfo.getCardNumber());
-        var actualFirstCardBalance = DashboardPage.getCardBalance(firstCardInfo);
-        var actualSecondCardBalance = DashboardPage.getCardBalance(secondCardInfo);
+        var transferPage = dashboardPage.selectCardToTransfer(secondCardInfo);
+        dashboardPage = transferPage.makeTransfer(String.valueOf(amount), firstCardInfo);
+        var actualFirstCardBalance = dashboardPage.getCardBalance(firstCardInfo);
+        var actualSecondCardBalance = dashboardPage.getCardBalance(secondCardInfo);
         assertEquals(expectedFirstCardBalance, actualFirstCardBalance);
         assertEquals(expectedSecondCardBalance, actualSecondCardBalance);
     }
@@ -43,9 +46,10 @@ public class CardTransferTest {
     public void shouldGiveErrorTest() {
         var firstCardInfo = getFirstCardInfo();
         var secondCardInfo = getSecondCardInfo();
-        var firstCardBalance = DashboardPage.getCardBalance(firstCardInfo);
-        var amount = firstCardBalance + DataHelper.getValidAmount(firstCardInfo);
-        CardTransferPage.makeTransfer(String.valueOf(amount), firstCardInfo.getCardNumber(), secondCardInfo.getCardNumber());
-        CardTransferPage.transferError("Ошибка! Произошла ошибка");
+        var firstCardBalance = dashboardPage.getCardBalance(firstCardInfo);
+        var amount = firstCardBalance + DataHelper.getValidAmount(10000);
+        var transferPage = dashboardPage.selectCardToTransfer(secondCardInfo);
+        dashboardPage = transferPage.makeTransfer(String.valueOf(amount), firstCardInfo);
+        cardTransferPage.transferError("На балансе карты недостаточно средств");
     }
 }

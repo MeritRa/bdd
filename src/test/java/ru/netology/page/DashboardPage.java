@@ -11,21 +11,21 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
 public class DashboardPage {
-    private final SelenideElement dashboard = $("[data-test-id=dashboard]");
     private static final ElementsCollection cards = $$(".list__item div");
-    private static final String balanceStart = "баланс: ";
-    private static final String balanceFinish = " р.";
+    private final SelenideElement dashboard = $("[data-test-id=dashboard]");
+    private final String balanceStart = "баланс: ";
+    private final String balanceFinish = " р.";
 
     public DashboardPage() {
         dashboard.shouldBe(Condition.visible);
     }
 
-    public static int getCardBalance(DataHelper.CardInfo cardInfo) {
+    public int getCardBalance(DataHelper.CardInfo cardInfo) {
         String text = cards.find(text(cardInfo.getCardNumber().substring(15))).getText();
         return extractBalance(text);
     }
 
-    private static int extractBalance(String text) {
+    private int extractBalance(String text) {
         val start = text.indexOf(balanceStart);
         val finish = text.indexOf(balanceFinish);
         val value = text.substring(start + balanceStart.length(), finish);
