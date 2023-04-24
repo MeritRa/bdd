@@ -14,7 +14,6 @@ import static ru.netology.data.DataHelper.getSecondCardInfo;
 
 public class CardTransferTest {
     DashboardPage dashboardPage;
-    CardTransferPage cardTransferPage;
     @BeforeEach
     void setUp() {
         open("http://localhost:9999/");
@@ -49,7 +48,7 @@ public class CardTransferTest {
         var firstCardBalance = dashboardPage.getCardBalance(firstCardInfo);
         var amount = firstCardBalance + DataHelper.getValidAmount(10000);
         var transferPage = dashboardPage.selectCardToTransfer(secondCardInfo);
-        dashboardPage = transferPage.makeTransfer(String.valueOf(amount), firstCardInfo);
-        cardTransferPage.transferError("На балансе карты недостаточно средств");
+        transferPage.makeTransfer(String.valueOf(amount), firstCardInfo);
+        transferPage.transferError("На балансе карты недостаточно средств");
     }
 }
